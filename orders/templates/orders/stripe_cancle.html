@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Payment Cancelled{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-center mt-5">
+    <div class="card shadow p-4" style="max-width: 450px; width: 100%;">
+        <div class="text-center">
+            <div class="text-danger mb-3" style="font-size: 50px;">
+                &#10060;
+            </div>
+            <h3>Payment Cancelled</h3>
+            <p class="text-muted">
+                Your payment did not go through. You can review your cart or try again.
+            </p>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'store:cart_detail' %}" class="btn btn-secondary w-50 me-2">
+                Go to Cart
+            </a>
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary w-50">
+                Continue Shopping
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

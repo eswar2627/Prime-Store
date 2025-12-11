@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Order Success{% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="alert alert-success">
+    <h2>🎉 Thank you! Your order has been placed.</h2>
+    <p>Order ID: <strong>#{{ order.id }}</strong></p>
+    <p>A confirmation email has been sent to: <strong>{{ order.email }}</strong></p>
+  </div>
+  <h4>Order Summary</h4>
+  <ul class="list-group mb-4">
+    <li class="list-group-item d-flex justify-content-between">
+      <span><strong>Subtotal</strong></span>
+      <span>₹{{ order.get_total_cost|add:order.discount }}</span>
+    </li>
+    {% if order.coupon %}
+    <li class="list-group-item d-flex justify-content-between">
+      <span><strong>Coupon Applied ({{ order.coupon.code }})</strong></span>
+      <span class="text-danger">- ₹{{ order.discount }}</span>
+    </li>
+    {% endif %}
+    <li class="list-group-item active d-flex justify-content-between">
+      <span><strong>Total Paid</strong></span>
+      <span>₹{{ order.total_amount }}</span>
+    </li>
+  </ul>
+  <a href="{% url 'store:product_list' %}" class="btn btn-primary mt-3">
+    Continue Shopping
+  </a>
+</div>
+{% endblock %}
