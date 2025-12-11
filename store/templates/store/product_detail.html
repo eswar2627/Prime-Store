@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<style>
+.product-wrapper {
+    display: flex;
+    gap: 40px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+.left-section {
+    width: 420px;
+}
+.slider-box {
+    position: relative;
+    width: 420px;
+    height: 380px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    overflow: hidden;
+}
+.slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity .4s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.slide.active { opacity: 1; }
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    background: rgba(0,0,0,0.45);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    z-index: 10;
+}
+.prev-btn { left: 10px; }
+.next-btn { right: 10px; }
+.thumb-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+.thumb {
+    flex: 0 0 auto;
+    width: 70px;
+    height: 70px;
+    padding: 6px;
+    background: #fff;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: .2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+}
+.thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.thumb.active {
+    border-color: #3b82f6;
+    transform: scale(1.08);
+}
+.right-section {
+    flex: 1;
+    min-width: 350px;
+}
+.product-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+.product-price {
+    margin-top: 10px;
+    font-size: 28px;
+    font-weight: 900;
+    color: #0dbb63 !important;
+}
+.product-description {
+    margin-top: 12px;
+    color: #d1d5db;
+    font-size: 15px;
+}
+.spec-section {
+    margin-top: 25px;
+}
+.spec-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: white;
+}
+.spec-box {
+    list-style: none;
+    padding-left: 0;
+    font-size: 16px;
+    color: #d1d5db;
+}
+.spec-box li {
+    margin-bottom: 6px;
+}
+.spec-box b {
+    color: #22c55e;
+}
+.about-box {
+    margin-top: 25px;
+    padding: 18px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(6px);
+}
+.about-box h4 {
+    font-weight: 700;
+    color: #fff;
+}
+.about-text {
+    font-size: 15px;
+    color: #e5e7eb;
+    white-space: pre-line;
+}
+</style>
+<div class="container">
+    <div class="product-wrapper">
+        <div class="left-section">
+            <div class="slider-box" id="slider">
+                <button class="slider-btn prev-btn" id="prevBtn">❮</button>
+                <button class="slider-btn next-btn" id="nextBtn">❯</button>
+                <div class="slide active">
+                    <img src="{{ product.image.url }}">
+                </div>
+                {% for img in product.gallery.all %}
+                <div class="slide">
+                    <img src="{{ img.image.url }}">
+                </div>
+                {% endfor %}
+            </div>
+            <div class="thumb-row" id="thumbRow">
+                <div class="thumb active" data-index="0">
+                    <img src="{{ product.image.url }}">
+                </div>
+                {% for img in product.gallery.all %}
+                <div class="thumb" data-index="{{ forloop.counter }}">
+                    <img src="{{ img.image.url }}">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="right-section">
+            <h2 class="product-title">{{ product.name }}</h2>
+            <div class="product-price">₹{{ product.price }}</div>
+            <p class="product-description">{{ product.description|linebreaks }}</p>
+            <div style="max-width:200px;">
+                <div class="input-group">
+                    <input type="number" id="qty" class="form-control" value="1" min="1">
+                    <button class="btn btn-success" onclick="addToCart({{ product.id }})">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+            {% if user.is_authenticated %}
+            <a href="{% url 'store:wishlist_add' product.id %}"
+               class="btn btn-outline-danger mt-3">❤️ Add to Wishlist</a>
+            {% endif %}
+            <div class="spec-section">
+                <h3 class="spec-title">Specifications</h3>
+                <ul class="spec-box">
+                    {% if product.brand %}<li><b>Brand:</b> {{ product.brand }}</li>{% endif %}
+                    {% if product.model_name %}<li><b>Model Name:</b> {{ product.model_name }}</li>{% endif %}
+                    {% if product.colour %}<li><b>Colour:</b> {{ product.colour }}</li>{% endif %}
+                    {% if product.screen_size %}<li><b>Screen Size:</b> {{ product.screen_size }}</li>{% endif %}
+                    {% if product.storage_capacity %}<li><b>Storage:</b> {{ product.storage_capacity }}</li>{% endif %}
+                    {% if product.hard_disk_size %}<li><b>Hard Disk:</b> {{ product.hard_disk_size }}</li>{% endif %}
+                    {% if product.ram_size %}<li><b>RAM:</b> {{ product.ram_size }}</li>{% endif %}
+                    {% if product.cpu_model %}<li><b>CPU Model:</b> {{ product.cpu_model }}</li>{% endif %}
+                    {% if product.operating_system %}<li><b>OS:</b> {{ product.operating_system }}</li>{% endif %}
+                    {% if product.graphics_card %}<li><b>GPU:</b> {{ product.graphics_card }}</li>{% endif %}
+                    {% if product.graphics_coprocessor %}<li><b>Co-Processor:</b> {{ product.graphics_coprocessor }}</li>{% endif %}
+                </ul>
+            </div>
+            {% if product.about_this_item %}
+            <div class="about-box">
+                <h4>About This Item</h4>
+                <p class="about-text">{{ product.about_this_item|linebreaks }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    let slides = document.querySelectorAll(".slide");
+    let thumbs = document.querySelectorAll(".thumb");
+    let current = 0;
+    function showSlide(index) {
+        slides.forEach(s => s.classList.remove("active"));
+        thumbs.forEach(t => t.classList.remove("active"));
+        slides[index].classList.add("active");
+        thumbs[index].classList.add("active");
+        current = index;
+    }
+    setInterval(() => {
+        current = (current + 1) % slides.length;
+        showSlide(current);
+    }, 3000);
+    thumbs.forEach((thumb, index) => {
+        thumb.addEventListener("click", () => showSlide(index));
+    });
+    document.getElementById("prevBtn").addEventListener("click", () => {
+        current = (current - 1 + slides.length) % slides.length;
+        showSlide(current);
+    });
+    document.getElementById("nextBtn").addEventListener("click", () => {
+        current = (current + 1) % slides.length;
+        showSlide(current);
+    });
+});
+</script>
+<script>
+function addToCart(productId) {
+    let quantity = document.getElementById("qty").value;
+    let csrfToken = "{{ csrf_token }}";
+    fetch("/cart/add/" + productId + "/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": csrfToken,
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: "quantity=" + quantity
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.cart_count !== undefined) {
+            document.getElementById("cart-count").innerText = data.cart_count;
+            document.getElementById("cart-count").classList.add("bg-success");
+            setTimeout(() => {
+                document.getElementById("cart-count").classList.remove("bg-success");
+            }, 600);
+        }
+    })
+    .catch(err => console.error(err));
+}
+</script>
+{% endblock %}
