@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<style>
+    .chart-box {
+        max-width: 700px;
+        margin: 30px auto;
+    }
+    .small-chart {
+        max-width: 350px;
+        margin: 20px auto;
+    }
+    canvas {
+        max-height: 280px !important;
+    }
+    h4 {
+        margin-top: 40px;
+    }
+</style>
+<h2 class="mb-4">Admin Dashboard</h2>
+<div class="row">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white text-center mb-4">
+            <div class="card-body">
+                <h4>Total Orders</h4>
+                <h2>{{ total_orders }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white text-center mb-4">
+            <div class="card-body">
+                <h4>Total Revenue</h4>
+                <h2>₹{{ total_revenue }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white text-center mb-4">
+            <div class="card-body">
+                <h4>Orders Today</h4>
+                <h2>{{ orders_today }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white text-center mb-4">
+            <div class="card-body">
+                <h4>Today's Revenue</h4>
+                <h2>₹{{ revenue_today }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+<h4>Top Selling Products</h4>
+<table class="table table-bordered mt-3">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Total Sold</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in top_products %}
+        <tr>
+            <td>{{ p.product__name }}</td>
+            <td>{{ p.total_qty }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h4 class="mt-5">Data Export</h4>
+<div class="d-flex flex-wrap gap-3 mb-4">
+    <a href="{% url 'dashboard:export_orders_csv' %}" class="btn btn-outline-primary">Export Orders (CSV)</a>
+    <a href="{% url 'dashboard:export_orders_excel' %}" class="btn btn-outline-success">Export Orders (Excel)</a>
+    <a href="{% url 'dashboard:export_orderitems_csv' %}" class="btn btn-outline-primary">Export Order Items (CSV)</a>
+    <a href="{% url 'dashboard:export_orderitems_excel' %}" class="btn btn-outline-success">Export Order Items (Excel)</a>
+</div>
+<hr>
+<h4>Daily Sales (Last 7 Days)</h4>
+<div class="chart-box">
+    <canvas id="lineChart"></canvas>
+</div>
+<h4>Top Selling Products Chart</h4>
+<div class="chart-box">
+    <canvas id="barChart"></canvas>
+</div>
+<h4>Payment Status Breakdown</h4>
+<div class="small-chart">
+    <canvas id="pieChart"></canvas>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: {{ date_labels|safe }},
+        datasets: [{
+            label: "Sales (₹)",
+            data: {{ sales_data|safe }},
+            borderColor: "#007bff",
+            borderWidth: 3,
+            tension: 0.3
+        }]
+    }
+});
+</script>
+<script>
+new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+        labels: [{% for p in top_products %}"{{ p.product__name }}",{% endfor %}],
+        datasets: [{
+            label: "Units Sold",
+            data: [{% for p in top_products %}{{ p.total_qty }},{% endfor %}],
+            backgroundColor: "#4CAF50"
+        }]
+    }
+});
+</script>
+<script>
+new Chart(document.getElementById('pieChart'), {
+    type: 'pie',
+    data: {
+        labels: ["Paid Orders", "Unpaid Orders"],
+        datasets: [{
+            data: [{{ paid_orders }}, {{ unpaid_orders }}],
+            backgroundColor: ["#28a745", "#dc3545"]
+        }]
+    }
+});
+</script>
+<hr>
+<h4>Customer Type Breakdown</h4>
+<div class="small-chart">
+    <canvas id="customerPie"></canvas>
+</div>
+<script>
+new Chart(document.getElementById('customerPie'), {
+    type: 'pie',
+    data: {
+        labels: ["New", "Returning"],
+        datasets: [{
+            data: [{{ new_customers }}, {{ returning_customers }}],
+            backgroundColor: ["#007bff", "#ffc107"]
+        }]
+    }
+});
+</script>
+<h4>Monthly New Customers</h4>
+<div class="chart-box">
+    <canvas id="customerLine"></canvas>
+</div>
+<script>
+new Chart(document.getElementById('customerLine'), {
+    type: 'line',
+    data: {
+        labels: {{ customer_month_labels|safe }},
+        datasets: [{
+            label: "New Customers",
+            data: {{ customer_month_data|safe }},
+            borderColor: "#17a2b8",
+            borderWidth: 3,
+            tension: 0.3
+        }]
+    }
+});
+</script>
+<hr>
+<h4>Top Customers</h4>
+<table class="table table-hover mt-3">
+    <thead class="table-primary">
+        <tr>
+            <th>Email</th>
+            <th>Total Orders</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cust in top_customers %}
+        <tr>
+            <td>{{ cust.email }}</td>
+            <td>{{ cust.order_count }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr>
+<h4>Monthly Sales (Revenue)</h4>
+<div class="chart-box">
+    <canvas id="monthlyChart"></canvas>
+</div>
+<script>
+new Chart(document.getElementById('monthlyChart'), {
+    type: "bar",
+    data: {
+        labels: {{ months_labels|safe }},
+        datasets: [{
+            label: "Revenue (₹)",
+            data: {{ months_data|safe }},
+            backgroundColor: "#6f42c1",
+            borderWidth: 2
+        }]
+    }
+});
+</script>
+<hr>
+<h4>Recent Orders</h4>
+<table class="table table-hover mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in recent_orders %}
+        <tr>
+            <td>#{{ order.id }}</td>
+            <td>{{ order.email }}</td>
+            <td>₹{{ order.get_total_cost }}</td>
+            <td>
+                {% if order.paid %}
+                <span class="badge bg-success">Paid</span>
+                {% else %}
+                <span class="badge bg-danger">Unpaid</span>
+                {% endif %}
+            </td>
+            <td>{{ order.created|date:"M d, Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<hr>
+<h4 class="text-danger">Low Stock Alerts</h4>
+<table class="table table-bordered mt-3">
+    <thead class="table-danger">
+        <tr>
+            <th>Product</th>
+            <th>Stock</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in low_stock_products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.stock }}</td>
+            <td>
+                {% if product.stock <= 2 %}
+                <span class="badge bg-danger">CRITICAL</span>
+                {% else %}
+                <span class="badge bg-warning text-dark">Low</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
