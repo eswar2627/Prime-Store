@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Add Address{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-white" style="max-width:600px;">
+    <h3 class="fw-bold mb-3">Add New Address</h3>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <label class="form-label">Full Name</label>
+        <input type="text" name="full_name" class="form-control mb-3" required>
+
+        <label class="form-label">Phone</label>
+        <input type="text" name="phone" class="form-control mb-3" required>
+
+        <label class="form-label">City</label>
+        <input type="text" name="city" class="form-control mb-3" required>
+
+        <label class="form-label">State</label>
+        <input type="text" name="state" class="form-control mb-3" required>
+
+        <label class="form-label">Postal Code</label>
+        <input type="text" name="postal_code" class="form-control mb-3" required>
+
+        <button type="submit" class="btn btn-warning w-100 fw-bold">
+            Save Address
+        </button>
+    </form>
+</div>
+{% endblock %}
