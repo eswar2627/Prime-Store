@@ -126,7 +126,7 @@ Django Admin customization
 
 <img width="1920" height="952" alt="login" src="https://github.com/user-attachments/assets/72637ade-6ff3-4f59-b200-e257aab025ab" />
 <img width="1894" height="955" alt="register" src="https://github.com/user-attachments/assets/0ce78fcb-f2fe-4439-8a6a-90beb49928df" />
-<img width="1895" height="950" alt="interface" src="https://github.com/user-attachments/assets/4b06d009-abdd-46e9-836b-799919636529" />
+<img width="1890" height="932" alt="Screenshot (1050)" src="https://github.com/user-attachments/assets/7a27b882-9110-4892-8e89-57fd6d196d05" />
 <img width="1920" height="957" alt="product details" src="https://github.com/user-attachments/assets/a9f337e0-15b2-4a29-b42c-df16ee4e30c4" />
 <img width="1920" height="954" alt="cart" src="https://github.com/user-attachments/assets/5ed8cc80-f18f-45d1-a0d9-cd7c3db09d8f" />
 <img width="1920" height="952" alt="check out" src="https://github.com/user-attachments/assets/634bac41-cb83-4a73-8241-46555099c069" />
