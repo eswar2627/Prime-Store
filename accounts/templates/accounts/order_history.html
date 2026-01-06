@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Order History{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="fw-bold mb-4">Order History</h2>
+
+    {% if orders %}
+        {% for order in orders %}
+        <div class="card mb-4 shadow-sm p-3">
+
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5 class="fw-bold">Order #{{ order.id }}</h5>
+                    <p class="text-muted mb-1">Placed on {{ order.created|date:"d M Y, h:i A" }}</p>
+                </div>
+
+                <span class="badge fs-6 px-3 py-2 rounded-pill
+                    {% if order.status == 'PLACED' %} bg-secondary
+                    {% elif order.status == 'PACKED' %} bg-info
+                    {% elif order.status == 'SHIPPED' %} bg-primary
+                    {% elif order.status == 'OUT_FOR_DELIVERY' %} bg-warning text-dark
+                    {% elif order.status == 'DELIVERED' %} bg-success
+                    {% endif %}">
+                    {{ order.get_status_display }}
+                </span>
+            </div>
+
+            <hr>
+
+            <div class="row">
+
+                {% for item in order.items.all|slice:":2" %}
+                <div class="col-md-6 d-flex mb-3">
+                    <img src="{{ item.product.image.url }}"
+                         class="rounded"
+                         style="width:80px; height:80px; object-fit:cover;">
+
+                    <div class="ms-3">
+                        <h6 class="fw-semibold">{{ item.product.name }}</h6>
+                        <p class="text-muted mb-1">Qty: {{ item.quantity }}</p>
+                        <p class="fw-bold text-primary">₹{{ item.get_cost }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+
+            {% if order.items.count > 2 %}
+            <p class="text-muted small">+ {{ order.items.count|add:"-2" }} more items</p>
+            {% endif %}
+
+            <hr>
+
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold">Total: ₹{{ order.get_total_cost }}</h5>
+                <a href="{% url 'orders:order_detail' order.id %}"
+                   class="btn btn-outline-primary">
+                    View Details
+                </a>
+            </div>
+
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info text-center">
+            You have no orders yet.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

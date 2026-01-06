@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<style>
+.register-card {
+    max-width: 460px;
+    margin: 60px auto;
+    padding: 35px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+}
+.register-title {
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 25px;
+}
+.register-card input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+.register-btn {
+    width: 100%;
+    padding: 10px;
+    font-size: 17px;
+    font-weight: 700;
+    background: #0dbb63;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+.register-btn:hover {
+    background: #0aa354;
+}
+.login-text {
+    text-align: center;
+    color: #ddd;
+    margin-top: 15px;
+}
+.login-text a {
+    color: #4f9cff;
+    text-decoration: none;
+}
+.login-text a:hover {
+    text-decoration: underline;
+}
+</style>
+<div class="register-card">
+    <h3 class="register-title">Create Account</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="register-btn">Register</button>
+    </form>
+    <p class="login-text">
+        Already have an account? <a href="{% url 'accounts:login' %}">Login</a>
+    </p>
+</div>
+{% endblock %}
